@@ -16,7 +16,15 @@ class UserController extends Controller
     {
         $query = User::select('id', 'name', 'email', 'email_verified_at', 'created_at');
 
-        if ($request->has('status')) {
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'ILIKE', "%{$search}%")
+                  ->orWhere('email', 'ILIKE', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
             $status = $request->get('status');
             if ($status === 'verified') {
                 $query->whereNotNull('email_verified_at');
@@ -30,6 +38,7 @@ class UserController extends Controller
         return Inertia::render('users/index', [
             'users' => $users,
             'filters' => [
+                'search' => $request->get('search'),
                 'status' => $request->get('status'),
             ],
         ]);
