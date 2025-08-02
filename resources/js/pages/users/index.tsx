@@ -5,7 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Calendar, CheckCircle, ChevronLeft, ChevronRight, Eye, Mail, User, XCircle } from 'lucide-react';
+import { Calendar, CheckCircle, ChevronLeft, ChevronRight, Mail, User, XCircle } from 'lucide-react';
 
 interface User {
     id: number;
@@ -72,20 +72,20 @@ export default function UsersTable({ users }: UsersIndexProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-3 sm:gap-6 sm:p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">Users</h1>
-                        <p className="text-muted-foreground">Manage and view all registered users ({users.total} total)</p>
+                        <h1 className="text-xl font-bold tracking-tight sm:text-2xl">Users</h1>
+                        <p className="text-sm text-muted-foreground sm:text-base">Manage and view all registered users ({users.total} total)</p>
                     </div>
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>All Users</CardTitle>
+                        <CardTitle className="text-lg sm:text-xl">All Users</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div className="overflow-x-auto">
+                    <CardContent className="p-0 sm:p-6">
+                        <div className="hidden overflow-x-auto md:block">
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b">
@@ -93,7 +93,6 @@ export default function UsersTable({ users }: UsersIndexProps) {
                                         <th className="px-2 py-3 text-left font-medium">Email</th>
                                         <th className="px-2 py-3 text-left font-medium">Status</th>
                                         <th className="px-2 py-3 text-left font-medium">Joined</th>
-                                        <th className="px-2 py-3 text-right font-medium">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -137,14 +136,6 @@ export default function UsersTable({ users }: UsersIndexProps) {
                                                         {formatDate(user.created_at)}
                                                     </div>
                                                 </td>
-                                                <td className="px-2 py-3 text-right">
-                                                    <Button asChild variant="outline" size="sm">
-                                                        <Link href={`/users/${user.id}`}>
-                                                            <Eye className="mr-2 h-4 w-4" />
-                                                            View
-                                                        </Link>
-                                                    </Button>
-                                                </td>
                                             </tr>
                                         );
                                     })}
@@ -152,18 +143,61 @@ export default function UsersTable({ users }: UsersIndexProps) {
                             </table>
                         </div>
 
+                        <div className="space-y-3 p-3 md:hidden">
+                            {users.data.map((user) => {
+                                const isEmailVerified = user.email_verified_at !== null;
+
+                                return (
+                                    <div key={user.id} className="space-y-3 rounded-lg border bg-card p-4">
+                                        <div className="flex items-start justify-between">
+                                            <div className="min-w-0 flex-1">
+                                                <div className="mb-1 flex items-center gap-2">
+                                                    <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                                                    <p className="truncate font-medium">{user.name}</p>
+                                                </div>
+                                                <div className="mb-2 flex items-center gap-2">
+                                                    <Mail className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                                                    <span className="truncate text-sm text-muted-foreground">{user.email}</span>
+                                                </div>
+                                            </div>
+                                            <Badge variant={isEmailVerified ? 'default' : 'destructive'} className="ml-2 flex-shrink-0 text-xs">
+                                                {isEmailVerified ? (
+                                                    <>
+                                                        <CheckCircle className="mr-1 h-3 w-3" />
+                                                        Verified
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <XCircle className="mr-1 h-3 w-3" />
+                                                        Unverified
+                                                    </>
+                                                )}
+                                            </Badge>
+                                        </div>
+
+                                        <div className="flex items-center justify-between border-t pt-2">
+                                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                <Calendar className="h-3 w-3" />
+                                                <span>Joined {formatDate(user.created_at)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
                         {users.data.length === 0 && (
-                            <div className="py-12 text-center">
-                                <User className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                                <h3 className="mb-2 text-lg font-medium">No users found</h3>
-                                <p className="text-muted-foreground">There are no registered users yet.</p>
+                            <div className="px-4 py-8 text-center sm:py-12">
+                                <User className="mx-auto mb-4 h-10 w-10 text-muted-foreground sm:h-12 sm:w-12" />
+                                <h3 className="mb-2 text-base font-medium sm:text-lg">No users found</h3>
+                                <p className="text-sm text-muted-foreground sm:text-base">There are no registered users yet.</p>
                             </div>
                         )}
                     </CardContent>
                 </Card>
 
                 {users.last_page > 1 && (
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-1 px-2 sm:gap-2">
                         {users.links.map((link, index) => (
                             <Button
                                 key={index}
@@ -171,7 +205,7 @@ export default function UsersTable({ users }: UsersIndexProps) {
                                 size="sm"
                                 asChild={!!link.url}
                                 disabled={!link.url}
-                                className="min-w-[40px]"
+                                className="h-8 min-w-[32px] text-xs sm:h-9 sm:min-w-[40px] sm:text-sm"
                             >
                                 {link.url ? <Link href={link.url}>{getPaginationContent(link.label)}</Link> : getPaginationContent(link.label)}
                             </Button>
