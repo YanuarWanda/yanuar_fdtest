@@ -14,12 +14,24 @@ class UserController extends Controller
      */
     public function index(Request $request): Response
     {
-        $users = User::select('id', 'name', 'email', 'email_verified_at', 'created_at')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = User::select('id', 'name', 'email', 'email_verified_at', 'created_at');
+
+        if ($request->has('status')) {
+            $status = $request->get('status');
+            if ($status === 'verified') {
+                $query->whereNotNull('email_verified_at');
+            } elseif ($status === 'unverified') {
+                $query->whereNull('email_verified_at');
+            }
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return Inertia::render('users/index', [
             'users' => $users,
+            'filters' => [
+                'status' => $request->get('status'),
+            ],
         ]);
     }
 

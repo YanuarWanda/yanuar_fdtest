@@ -1,11 +1,12 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { Calendar, CheckCircle, ChevronLeft, ChevronRight, Mail, User, XCircle } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { Calendar, CheckCircle, ChevronLeft, ChevronRight, Filter, Mail, User, XCircle } from 'lucide-react';
 
 interface User {
     id: number;
@@ -28,6 +29,9 @@ interface UsersIndexProps {
             active: boolean;
         }>;
     };
+    filters: {
+        status?: string;
+    };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -41,7 +45,45 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function UsersTable({ users }: UsersIndexProps) {
+export default function UsersTable({ users, filters }: UsersIndexProps) {
+    const handleStatusFilter = (value: string) => {
+        const url = new URL(window.location.href);
+
+        if (value === 'all') {
+            url.searchParams.delete('status');
+        } else {
+            url.searchParams.set('status', value);
+        }
+
+        url.searchParams.delete('page');
+
+        router.visit(url.toString(), {
+            preserveState: false,
+            preserveScroll: false,
+        });
+    };
+
+    const getFilterDisplayValue = () => {
+        switch (filters.status) {
+            case 'verified':
+                return 'verified';
+            case 'unverified':
+                return 'unverified';
+            default:
+                return 'all';
+        }
+    };
+
+    const getFilterDisplayText = () => {
+        switch (filters.status) {
+            case 'verified':
+                return 'Verified Users';
+            case 'unverified':
+                return 'Unverified Users';
+            default:
+                return 'All Users';
+        }
+    };
     const getPaginationContent = (label: string) => {
         const cleanLabel = label
             .replace(/&laquo;/g, '')
@@ -73,16 +115,29 @@ export default function UsersTable({ users }: UsersIndexProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-3 sm:gap-6 sm:p-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-xl font-bold tracking-tight sm:text-2xl">Users</h1>
                         <p className="text-sm text-muted-foreground sm:text-base">Manage and view all registered users ({users.total} total)</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Filter className="h-4 w-4 text-muted-foreground" />
+                        <Select value={getFilterDisplayValue()} onValueChange={handleStatusFilter}>
+                            <SelectTrigger className="w-[140px] sm:w-[160px]">
+                                <SelectValue placeholder="Filter by status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Users</SelectItem>
+                                <SelectItem value="verified">Verified</SelectItem>
+                                <SelectItem value="unverified">Unverified</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg sm:text-xl">All Users</CardTitle>
+                        <CardTitle className="text-lg sm:text-xl">{getFilterDisplayText()}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0 sm:p-6">
                         <div className="hidden overflow-x-auto md:block">
