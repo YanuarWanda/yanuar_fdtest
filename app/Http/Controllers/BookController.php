@@ -22,8 +22,8 @@ class BookController extends Controller
         $filters = $request->only(['search', 'author', 'rating']);
 
         $perPage = min(
-            $request->get('per_page', config('book.pagination.per_page')),
-            config('book.pagination.max_per_page')
+            $request->get('per_page', 10),
+            50
         );
 
         $books = Book::withUser()
@@ -37,6 +37,41 @@ class BookController extends Controller
             'filters' => $filters,
             'authors' => $this->getAuthorsForUser(Auth::id()),
         ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): Response
+    {
+        return Inertia::render('books/create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'author' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:2000'],
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+        ]);
+
+        // Handle file upload
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('books/thumbnails', 'public');
+            $validated['thumbnail'] = $path;
+        }
+
+        // Associate with the authenticated user
+        $validated['user_id'] = Auth::id();
+
+        $book = Book::create($validated);
+
+        return redirect()->route('books.show', $book)->with('success', 'Book created successfully!');
     }
 
     /**
