@@ -72,7 +72,6 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
     }, [searchTerm, handleSearch]);
 
     const handleAuthorFilter = (value: string) => {
-        // Don't navigate if the filter hasn't changed
         if (value === getAuthorDisplayValue()) {
             return;
         }
@@ -85,7 +84,10 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
             url.searchParams.set('author', value);
         }
 
-        url.searchParams.delete('page');
+        const currentAuthor = filters.author || 'all';
+        if (value !== currentAuthor) {
+            url.searchParams.delete('page');
+        }
 
         router.visit(url.toString(), {
             preserveState: true,
@@ -106,7 +108,10 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
             url.searchParams.set('rating', value);
         }
 
-        url.searchParams.delete('page');
+        const currentRating = filters.rating || 'all';
+        if (value !== currentRating) {
+            url.searchParams.delete('page');
+        }
 
         router.visit(url.toString(), {
             preserveState: true,
@@ -115,6 +120,7 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
 
     const handleDateFromFilter = (value: string) => {
         const url = new URL(window.location.href);
+        const currentDateFrom = filters.date_from || '';
 
         if (value) {
             url.searchParams.set('date_from', value);
@@ -122,7 +128,9 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
             url.searchParams.delete('date_from');
         }
 
-        url.searchParams.delete('page');
+        if (value !== currentDateFrom) {
+            url.searchParams.delete('page');
+        }
 
         router.visit(url.toString(), {
             preserveState: true,
@@ -131,6 +139,7 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
 
     const handleDateToFilter = (value: string) => {
         const url = new URL(window.location.href);
+        const currentDateTo = filters.date_to || '';
 
         if (value) {
             url.searchParams.set('date_to', value);
@@ -138,7 +147,9 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
             url.searchParams.delete('date_to');
         }
 
-        url.searchParams.delete('page');
+        if (value !== currentDateTo) {
+            url.searchParams.delete('page');
+        }
 
         router.visit(url.toString(), {
             preserveState: true,

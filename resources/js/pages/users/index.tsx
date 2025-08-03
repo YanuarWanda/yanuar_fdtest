@@ -33,21 +33,26 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function UsersTable({ users, filters }: UsersIndexProps) {
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
 
-    const handleSearch = useCallback((value: string) => {
-        const url = new URL(window.location.href);
+    const handleSearch = useCallback(
+        (value: string) => {
+            if (value.trim() === (filters.search || '')) {
+                return;
+            }
 
-        if (value.trim()) {
-            url.searchParams.set('search', value.trim());
-        } else {
-            url.searchParams.delete('search');
-        }
+            const url = new URL(window.location.href);
 
-        url.searchParams.delete('page');
+            if (value.trim()) {
+                url.searchParams.set('search', value.trim());
+            } else {
+                url.searchParams.delete('search');
+            }
 
-        router.visit(url.toString(), {
-            preserveState: true,
-        });
-    }, []);
+            router.visit(url.toString(), {
+                preserveState: true,
+            });
+        },
+        [filters.search],
+    );
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -63,6 +68,7 @@ export default function UsersTable({ users, filters }: UsersIndexProps) {
 
     const handleStatusFilter = (value: string) => {
         const url = new URL(window.location.href);
+        const currentStatus = filters.status || 'all';
 
         if (value === 'all') {
             url.searchParams.delete('status');
@@ -70,7 +76,9 @@ export default function UsersTable({ users, filters }: UsersIndexProps) {
             url.searchParams.set('status', value);
         }
 
-        url.searchParams.delete('page');
+        if (value !== currentStatus) {
+            url.searchParams.delete('page');
+        }
 
         router.visit(url.toString());
     };

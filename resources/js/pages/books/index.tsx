@@ -100,7 +100,10 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
             url.searchParams.set('author', value);
         }
 
-        url.searchParams.delete('page');
+        const currentAuthor = filters.author || 'all';
+        if (value !== currentAuthor) {
+            url.searchParams.delete('page');
+        }
 
         router.visit(url.toString(), {
             preserveState: true,
@@ -120,7 +123,10 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
             url.searchParams.set('rating', value);
         }
 
-        url.searchParams.delete('page');
+        const currentRating = filters.rating || 'all';
+        if (value !== currentRating) {
+            url.searchParams.delete('page');
+        }
 
         router.visit(url.toString(), {
             preserveState: true,
@@ -129,6 +135,7 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
 
     const handleDateFromFilter = (value: string) => {
         const url = new URL(window.location.href);
+        const currentDateFrom = filters.date_from || '';
 
         if (value) {
             url.searchParams.set('date_from', value);
@@ -136,7 +143,9 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
             url.searchParams.delete('date_from');
         }
 
-        url.searchParams.delete('page');
+        if (value !== currentDateFrom) {
+            url.searchParams.delete('page');
+        }
 
         router.visit(url.toString(), {
             preserveState: true,
@@ -145,6 +154,7 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
 
     const handleDateToFilter = (value: string) => {
         const url = new URL(window.location.href);
+        const currentDateTo = filters.date_to || '';
 
         if (value) {
             url.searchParams.set('date_to', value);
@@ -152,7 +162,10 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
             url.searchParams.delete('date_to');
         }
 
-        url.searchParams.delete('page');
+        // Only reset page if date filter actually changed
+        if (value !== currentDateTo) {
+            url.searchParams.delete('page');
+        }
 
         router.visit(url.toString(), {
             preserveState: true,
