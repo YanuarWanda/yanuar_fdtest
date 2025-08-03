@@ -69,7 +69,7 @@ class Book extends Model
             return $query;
         }
 
-        return $query->where('author', 'ILIKE', "%{$author}%");
+        return $query->whereRaw('LOWER(author) LIKE LOWER(?)', ["%{$author}%"]);
     }
 
     /**
@@ -94,7 +94,6 @@ class Book extends Model
         }
 
         if (!empty($dateFrom) && !empty($dateTo)) {
-            // Both dates provided - filter between range
             return $query->whereBetween('created_at', [
                 $dateFrom . ' 00:00:00',
                 $dateTo . ' 23:59:59'
@@ -102,12 +101,10 @@ class Book extends Model
         }
 
         if (!empty($dateFrom)) {
-            // Only from date - filter from date onwards
             return $query->where('created_at', '>=', $dateFrom . ' 00:00:00');
         }
 
         if (!empty($dateTo)) {
-            // Only to date - filter up to date
             return $query->where('created_at', '<=', $dateTo . ' 23:59:59');
         }
 
@@ -124,8 +121,8 @@ class Book extends Model
         }
 
         return $query->where(function ($query) use ($search) {
-            $query->where('title', 'ILIKE', "%{$search}%")
-                ->orWhere('author', 'ILIKE', "%{$search}%");
+            $query->whereRaw('LOWER(title) LIKE LOWER(?)', ["%{$search}%"])
+                ->orWhereRaw('LOWER(author) LIKE LOWER(?)', ["%{$search}%"]);
         });
     }
 

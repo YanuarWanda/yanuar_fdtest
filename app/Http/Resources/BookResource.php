@@ -20,16 +20,16 @@ class BookResource extends JsonResource
             'author' => $this->author,
             'description' => $this->description,
             'rating' => $this->rating,
-            'formatted_rating' => $this->getFormattedRatingAttribute(),
+            'formatted_rating' => $this->formatted_rating,
             'thumbnail' => $this->thumbnail,
-            'thumbnail_url' => $this->getThumbnailUrlAttribute(),
+            'thumbnail_url' => $this->thumbnail_url,
             'user' => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
-                'initials' => $this->user->getInitials(),
+                'initials' => $this->user->initials,
             ],
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

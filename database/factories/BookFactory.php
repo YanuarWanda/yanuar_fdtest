@@ -179,4 +179,36 @@ class BookFactory extends Factory
             'user_id' => $user->id,
         ]);
     }
+
+    /**
+     * Create a book with a thumbnail.
+     */
+    public function withThumbnail(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'thumbnail' => 'books/thumbnails/test-thumbnail.jpg',
+        ]);
+    }
+
+    /**
+     * Create a book with specific creation date.
+     */
+    public function createdAt(string $date): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'created_at' => $date,
+            'updated_at' => $date,
+        ]);
+    }
+
+    /**
+     * Create a book for testing search functionality.
+     */
+    public function searchable(string $title, string $author): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'title' => $title,
+            'author' => $author,
+        ]);
+    }
 }

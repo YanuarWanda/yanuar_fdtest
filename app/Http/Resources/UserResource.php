@@ -20,6 +20,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at?->toISOString(),
             'created_at' => $this->created_at->toISOString(),
+            'initials' => $this->initials,
             'is_verified' => !is_null($this->email_verified_at),
             'joined_date' => $this->created_at->format('M j, Y'),
             'verification_status' => $this->email_verified_at ? 'verified' : 'unverified',

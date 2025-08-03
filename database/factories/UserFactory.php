@@ -37,8 +37,28 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the model's email address should be verified.
+     */
+    public function verified(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'email_verified_at' => now(),
+        ]);
+    }
+
+    /**
+     * Create a user with specific name for testing initials.
+     */
+    public function withName(string $name): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'name' => $name,
         ]);
     }
 }

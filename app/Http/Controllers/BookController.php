@@ -48,7 +48,7 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): Response|AnonymousResourceCollection
+    public function index(Request $request): Response
     {
         $filters = $request->only(['search', 'author', 'rating', 'date_from', 'date_to']);
 

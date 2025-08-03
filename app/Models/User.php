@@ -48,6 +48,35 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the user's initials.
+     */
+    public function getInitialsAttribute(): string
+    {
+        if (empty($this->name)) {
+            return '';
+        }
+
+        $words = preg_split('/\s+/', trim($this->name));
+        $words = array_filter($words);
+
+        if (empty($words)) {
+            return '';
+        }
+
+        $initials = '';
+        $count = 0;
+
+        foreach ($words as $word) {
+            if (!empty($word) && $count < 2) {
+                $initials .= strtoupper(substr($word, 0, 1));
+                $count++;
+            }
+        }
+
+        return $initials;
+    }
+
+    /**
      * Scope a query to search users by name or email.
      */
     public function scopeSearch($query, ?string $search)
@@ -57,8 +86,8 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return $query->where(function ($q) use ($search) {
-            $q->where('name', 'ILIKE', "%{$search}%")
-                ->orWhere('email', 'ILIKE', "%{$search}%");
+            $q->whereRaw('LOWER(name) LIKE LOWER(?)', ["%{$search}%"])
+                ->orWhereRaw('LOWER(email) LIKE LOWER(?)', ["%{$search}%"]);
         });
     }
 
@@ -92,23 +121,5 @@ class User extends Authenticatable implements MustVerifyEmail
     public function books(): HasMany
     {
         return $this->hasMany(Book::class);
-    }
-
-    /**
-     * Get user initials for avatar display.
-     */
-    public function getInitials(): string
-    {
-        $names = explode(' ', trim($this->name));
-
-        if (count($names) >= 2) {
-            return strtoupper(substr($names[0], 0, 1) . substr($names[1], 0, 1));
-        }
-
-        if (count($names) === 1 && !empty($names[0])) {
-            return strtoupper(substr($names[0], 0, 2));
-        }
-
-        return 'U';
     }
 }
