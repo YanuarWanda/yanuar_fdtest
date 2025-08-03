@@ -22,8 +22,8 @@ class BookController extends Controller
         $filters = $request->only(['search', 'author', 'rating']);
 
         $perPage = min(
-            $request->get('per_page', 10),
-            50
+            $request->get('per_page', config('book.pagination.per_page')),
+            config('book.pagination.max_per_page')
         );
 
         $books = Book::withUser()
@@ -60,13 +60,11 @@ class BookController extends Controller
             'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
 
-        // Handle file upload
         if ($request->hasFile('thumbnail')) {
             $path = $request->file('thumbnail')->store('books/thumbnails', 'public');
             $validated['thumbnail'] = $path;
         }
 
-        // Associate with the authenticated user
         $validated['user_id'] = Auth::id();
 
         $book = Book::create($validated);
@@ -129,6 +127,8 @@ class BookController extends Controller
             $validated['thumbnail'] = $path;
 
             Log::info('File uploaded successfully:', ['path' => $path]);
+        } else {
+            unset($validated['thumbnail']);
         }
 
         $book->update($validated);
