@@ -5,6 +5,7 @@
 This project is based on the Laravel React Starter Kit, which provides a robust foundation for modern full-stack web applications. Each technology was carefully chosen for specific advantages:
 
 - **Laravel 12**: Modern PHP framework with robust backend features
+    - _Security_: Uses bcrypt as default password hashing for secure user authentication
 - **Pest PHP**: Modern testing framework for comprehensive test coverage
 - **React 19**: Component-based frontend with TypeScript support
 - **Inertia.js**: Seamless SPA experience without building a separate API
