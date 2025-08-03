@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -83,5 +84,31 @@ class User extends Authenticatable implements MustVerifyEmail
     public function scopeWithBasicInfo($query)
     {
         return $query->select('id', 'name', 'email', 'email_verified_at', 'created_at');
+    }
+
+    /**
+     * Get the books for the user.
+     */
+    public function books(): HasMany
+    {
+        return $this->hasMany(Book::class);
+    }
+
+    /**
+     * Get user initials for avatar display.
+     */
+    public function getInitials(): string
+    {
+        $names = explode(' ', trim($this->name));
+
+        if (count($names) >= 2) {
+            return strtoupper(substr($names[0], 0, 1) . substr($names[1], 0, 1));
+        }
+
+        if (count($names) === 1 && !empty($names[0])) {
+            return strtoupper(substr($names[0], 0, 2));
+        }
+
+        return 'U';
     }
 }

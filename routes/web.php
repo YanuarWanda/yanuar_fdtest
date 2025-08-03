@@ -1,20 +1,20 @@
 <?php
 
 use App\Http\Controllers\Users\UserController;
+use App\Http\Controllers\BookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+Route::get('/', [BookController::class, 'welcome'])->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard/index');
     })->name('dashboard');
 
-    // Users routes
     Route::get('users', [UserController::class, 'index'])->name('users.index');
+
+    Route::resource('books', BookController::class);
 });
 
 require __DIR__ . '/settings.php';

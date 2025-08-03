@@ -1,6 +1,6 @@
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, Users } from 'lucide-react';
+import { LayoutGrid, Library, Users } from 'lucide-react';
 import AppLogo from '../shared/app-logo';
 
 import { NavMain } from '@/components/navigation/nav-main';
@@ -18,6 +18,11 @@ const mainNavItems: NavItem[] = [
         href: '/users',
         icon: Users,
     },
+    {
+        title: 'Books',
+        href: '/books',
+        icon: Library,
+    },
 ];
 
 export function AppSidebar() {
@@ -27,7 +32,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                            <Link href="/" prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

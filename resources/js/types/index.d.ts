@@ -46,6 +46,13 @@ export interface PaginatedLink {
     active: boolean;
 }
 
+export interface ResourceLink {
+    first: string;
+    last: string;
+    next: string;
+    prev: string;
+}
+
 export interface PaginatedResource<T> {
     data: T[],
     meta: {
@@ -55,6 +62,7 @@ export interface PaginatedResource<T> {
         total: number;
         from: number | null;
         to: number | null;
+        links: PaginatedLink[]
     };
-    links: PaginatedLink[];
+    links: ResourceLink;
 }
