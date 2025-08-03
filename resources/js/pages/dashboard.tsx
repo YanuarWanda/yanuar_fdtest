@@ -1,11 +1,12 @@
+import { getInitials } from '@/lib/utils';
+import { SharedData, type BreadcrumbItem } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
+import { CheckCircle, Mail, XCircle } from 'lucide-react';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
-import { type Auth, type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
-import { CheckCircle, Mail, XCircle } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -15,12 +16,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
-    const page = usePage();
-    const auth = page.props.auth as Auth;
-    const user = auth?.user;
+    const {
+        auth: { user },
+    } = usePage<SharedData>().props;
     const isEmailVerified = user.email_verified_at !== null;
-
-    const getInitials = useInitials();
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -55,6 +54,7 @@ export default function Dashboard() {
                             </div>
                         </CardTitle>
                     </CardHeader>
+
                     {!isEmailVerified && (
                         <CardContent>
                             <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 dark:border-orange-800 dark:bg-orange-950">
