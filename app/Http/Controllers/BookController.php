@@ -61,7 +61,7 @@ class BookController extends Controller
             ->ownedBy(Auth::id())
             ->filtered($filters)
             ->latest()
-            ->paginate(2);
+            ->paginate($perPage);
 
         return Inertia::render('books/index', [
             'books' => BookResource::collection($books),

@@ -50,21 +50,28 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function BooksIndex({ books, filters, authors }: BooksPageProps) {
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
 
-    const handleSearch = useCallback((value: string) => {
-        const url = new URL(window.location.href);
+    const handleSearch = useCallback(
+        (value: string) => {
+            if (value.trim() === (filters.search || '')) {
+                return;
+            }
 
-        if (value.trim()) {
-            url.searchParams.set('search', value.trim());
-        } else {
-            url.searchParams.delete('search');
-        }
+            const url = new URL(window.location.href);
 
-        url.searchParams.delete('page');
+            if (value.trim()) {
+                url.searchParams.set('search', value.trim());
+            } else {
+                url.searchParams.delete('search');
+            }
 
-        router.visit(url.toString(), {
-            preserveState: true,
-        });
-    }, []);
+            url.searchParams.delete('page');
+
+            router.visit(url.toString(), {
+                preserveState: true,
+            });
+        },
+        [filters.search],
+    );
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -79,6 +86,10 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
     };
 
     const handleAuthorFilter = (value: string) => {
+        if (value === getAuthorDisplayValue()) {
+            return;
+        }
+
         const url = new URL(window.location.href);
 
         if (value === 'all') {
@@ -95,6 +106,10 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
     };
 
     const handleMinRatingFilter = (value: string) => {
+        if (value === getMinRatingDisplayValue()) {
+            return;
+        }
+
         const url = new URL(window.location.href);
 
         if (value === 'all') {
@@ -189,7 +204,7 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
                     )}
                 </div>
 
-                {books.meta.links && <Pagination links={books.meta.links} />}
+                {books.meta.links && <Pagination links={books.meta.links} filters={filters} />}
 
                 {books.meta.total > 0 && <PaginationInfo meta={books.meta} />}
             </div>
@@ -483,7 +498,7 @@ function EmptyStateMobile({ hasFilters, onCreate }: EmptyStateProps) {
     );
 }
 
-function Pagination({ links }: { links: PaginatedLink[] }) {
+function Pagination({ links, filters }: { links: PaginatedLink[]; filters: { search?: string; author?: string; rating?: string } }) {
     const getPaginationContent = (label: string) => {
         const cleanLabel = label
             .replace(/&laquo;/g, '')
@@ -503,6 +518,23 @@ function Pagination({ links }: { links: PaginatedLink[] }) {
         }
     };
 
+    const getUrlWithFilters = (baseUrl: string) => {
+        const url = new URL(baseUrl);
+
+        // Preserve current filters
+        if (filters.search) {
+            url.searchParams.set('search', filters.search);
+        }
+        if (filters.author) {
+            url.searchParams.set('author', filters.author);
+        }
+        if (filters.rating) {
+            url.searchParams.set('rating', filters.rating);
+        }
+
+        return url.toString();
+    };
+
     return (
         <div className="flex items-center justify-center gap-1 px-2 sm:gap-2">
             {links.map((link, index) => (
@@ -514,7 +546,7 @@ function Pagination({ links }: { links: PaginatedLink[] }) {
                     disabled={!link.url}
                     className="h-8 min-w-[32px] text-xs sm:h-9 sm:min-w-[40px] sm:text-sm"
                 >
-                    {link.url ? <Link href={link.url}>{getPaginationContent(link.label)}</Link> : getPaginationContent(link.label)}
+                    {link.url ? <Link href={getUrlWithFilters(link.url)}>{getPaginationContent(link.label)}</Link> : getPaginationContent(link.label)}
                 </Button>
             ))}
         </div>
