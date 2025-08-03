@@ -15,6 +15,37 @@ use Inertia\Response;
 class BookController extends Controller
 {
     /**
+     * Display all books for the welcome page (public access).
+     */
+    public function welcome(Request $request): Response
+    {
+        $filters = $request->only(['search', 'author', 'rating']);
+
+        $perPage = min(
+            $request->get('per_page', config('book.pagination.per_page')),
+            config('book.pagination.max_per_page')
+        );
+
+        $books = Book::withUser()
+            ->filtered($filters)
+            ->latest()
+            ->paginate($perPage);
+
+        $authors = Book::distinct()
+            ->pluck('author')
+            ->filter()
+            ->sort()
+            ->values()
+            ->toArray();
+
+        return Inertia::render('welcome', [
+            'books' => BookResource::collection($books),
+            'filters' => $filters,
+            'authors' => $authors,
+        ]);
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request): Response|AnonymousResourceCollection
@@ -30,7 +61,7 @@ class BookController extends Controller
             ->ownedBy(Auth::id())
             ->filtered($filters)
             ->latest()
-            ->paginate($perPage);
+            ->paginate(2);
 
         return Inertia::render('books/index', [
             'books' => BookResource::collection($books),
