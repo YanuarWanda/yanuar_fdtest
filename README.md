@@ -1,13 +1,29 @@
-# FDTest
+# Yanuar FDTest
+
+## 🛠️ Built With Laravel React Starter Kit
+
+This project is based on the Laravel React Starter Kit, which provides a robust foundation for modern full-stack web applications. Each technology was carefully chosen for specific advantages:
+
+- **Laravel 12**: Modern PHP framework with robust backend features
+- **Pest PHP**: Modern testing framework for comprehensive test coverage
+- **React 19**: Component-based frontend with TypeScript support
+- **Inertia.js**: Seamless SPA experience without building a separate API
+- **TypeScript**: Static typing for JavaScript
+- **Vite**: Lightning-fast build tool and development server
+- **Tailwind CSS**: Utility-first CSS framework for rapid styling
+- **Radix UI**: Headless, accessible React components
+    - _Why chosen_: Provides accessible components without opinionated styling
+- **Headless UI**: Unstyled, accessible UI components
+    - _Why chosen_: Complements Tailwind CSS perfectly with accessibility features
 
 ## 📋 Prerequisites
 
 Before installing, ensure you have the following installed on your system:
 
 - **PHP**: Version 8.2 or higher
-- **Composer**: Latest version
+- **Composer**: Version 2.6 or higher
 - **Node.js**: Version 18 or higher
-- **NPM/Yarn**: Latest version
+- **NPM**: Version 9.0 or higher (or **Yarn**: Version 1.22 or higher)
 - **Database**: PostgreSQL
 
 ### PHP Extensions Required
@@ -93,9 +109,22 @@ FILESYSTEM_DISK=public
 # Run database migrations
 php artisan migrate
 
-# (Optional) Seed the database with sample data
+# Seed the database with sample data (10 users + 100+ books)
 php artisan db:seed
 ```
+
+#### 🔑 Test Credentials
+
+After running the seeder, you can log in with these credentials:
+
+- **Email**: `admin@bookmanagement.com`
+- **Password**: `password`
+
+The seeder creates:
+
+- **10 users** (1 with known credentials + 9 random users)
+- **100+ unique books** distributed among all users
+- **Sample data** for testing search, filtering, and pagination features
 
 ### 7. Storage Setup
 
