@@ -47,8 +47,8 @@ return [
     ],
 
     'pagination' => [
-        'per_page' => 10,
-        'max_per_page' => 50,
+        'per_page' => 8,
+        'max_per_page' => 40,
     ],
 
     'rating' => [
