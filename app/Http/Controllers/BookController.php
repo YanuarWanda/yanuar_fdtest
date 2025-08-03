@@ -19,7 +19,7 @@ class BookController extends Controller
      */
     public function welcome(Request $request): Response
     {
-        $filters = $request->only(['search', 'author', 'rating']);
+        $filters = $request->only(['search', 'author', 'rating', 'date_from', 'date_to']);
 
         $perPage = min(
             $request->get('per_page', config('book.pagination.per_page')),
@@ -50,7 +50,7 @@ class BookController extends Controller
      */
     public function index(Request $request): Response|AnonymousResourceCollection
     {
-        $filters = $request->only(['search', 'author', 'rating']);
+        $filters = $request->only(['search', 'author', 'rating', 'date_from', 'date_to']);
 
         $perPage = min(
             $request->get('per_page', config('book.pagination.per_page')),

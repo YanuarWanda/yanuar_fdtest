@@ -31,6 +31,8 @@ interface WelcomePageProps extends SharedData {
         search?: string;
         author?: string;
         rating?: string;
+        date_from?: string;
+        date_to?: string;
     };
     authors: string[];
 }
@@ -111,11 +113,45 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
         });
     };
 
+    const handleDateFromFilter = (value: string) => {
+        const url = new URL(window.location.href);
+
+        if (value) {
+            url.searchParams.set('date_from', value);
+        } else {
+            url.searchParams.delete('date_from');
+        }
+
+        url.searchParams.delete('page');
+
+        router.visit(url.toString(), {
+            preserveState: true,
+        });
+    };
+
+    const handleDateToFilter = (value: string) => {
+        const url = new URL(window.location.href);
+
+        if (value) {
+            url.searchParams.set('date_to', value);
+        } else {
+            url.searchParams.delete('date_to');
+        }
+
+        url.searchParams.delete('page');
+
+        router.visit(url.toString(), {
+            preserveState: true,
+        });
+    };
+
     const clearFilters = () => {
         const url = new URL(window.location.href);
         url.searchParams.delete('search');
         url.searchParams.delete('author');
         url.searchParams.delete('rating');
+        url.searchParams.delete('date_from');
+        url.searchParams.delete('date_to');
         url.searchParams.delete('page');
 
         setSearchTerm('');
@@ -133,7 +169,7 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
         return filters.rating || 'all';
     };
 
-    const hasActiveFilters = Boolean(filters.search || filters.author || filters.rating);
+    const hasActiveFilters = Boolean(filters.search || filters.author || filters.rating || filters.date_from || filters.date_to);
 
     return (
         <>
@@ -147,14 +183,14 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex h-16 items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <Book className="h-8 w-8 text-blue-600" />
-                                <h1 className="text-xl font-bold text-gray-900 dark:text-white">Book Collection</h1>
+                                <Book className="h-6 w-6 text-blue-600 sm:h-8 sm:w-8" />
+                                <h1 className="text-lg font-bold text-gray-900 sm:text-xl dark:text-white">Book Collection</h1>
                             </div>
-                            <nav className="flex items-center gap-4">
+                            <nav className="flex items-center gap-2 sm:gap-4">
                                 {auth.user ? (
                                     <Link
                                         href={route('dashboard')}
-                                        className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                                        className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 sm:px-4"
                                     >
                                         Dashboard
                                     </Link>
@@ -162,17 +198,17 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
                                     <div className="flex items-center gap-2">
                                         <Link
                                             href={route('login')}
-                                            className="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                            className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:gap-2 sm:px-4 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                                         >
                                             <LogIn className="h-4 w-4" />
-                                            Log in
+                                            <span className="hidden sm:inline">Log in</span>
                                         </Link>
                                         <Link
                                             href={route('register')}
-                                            className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                                            className="inline-flex items-center gap-1 rounded-md bg-blue-600 px-2 py-2 text-sm font-medium text-white hover:bg-blue-700 sm:gap-2 sm:px-4"
                                         >
                                             <UserPlus className="h-4 w-4" />
-                                            Register
+                                            <span className="hidden sm:inline">Register</span>
                                         </Link>
                                     </div>
                                 )}
@@ -181,9 +217,9 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
                     </div>
                 </header>
 
-                <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                    <div className="mb-8">
-                        <h2 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">Discover Amazing Books</h2>
+                <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+                    <div className="mb-6 text-center sm:mb-8 sm:text-left">
+                        <h2 className="mb-2 text-2xl font-bold text-gray-900 sm:text-3xl dark:text-white">Discover Amazing Books</h2>
                         <p className="text-gray-600 dark:text-gray-400">Browse through our collection of books shared by our community</p>
                     </div>
 
@@ -195,8 +231,8 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex flex-col gap-4 md:flex-row md:items-end">
-                                <div className="flex-1">
+                            <div className="flex flex-col gap-4">
+                                <div className="w-full">
                                     <Input
                                         type="text"
                                         placeholder="Search books by title or author..."
@@ -205,9 +241,10 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
                                         className="w-full"
                                     />
                                 </div>
-                                <div className="flex flex-col gap-4 md:flex-row md:gap-2">
+
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                                     <Select value={getAuthorDisplayValue()} onValueChange={handleAuthorFilter}>
-                                        <SelectTrigger className="w-full md:w-48">
+                                        <SelectTrigger className="w-full">
                                             <SelectValue placeholder="All Authors" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -219,8 +256,9 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
                                             ))}
                                         </SelectContent>
                                     </Select>
+
                                     <Select value={getRatingDisplayValue()} onValueChange={handleRatingFilter}>
-                                        <SelectTrigger className="w-full md:w-48">
+                                        <SelectTrigger className="w-full">
                                             <SelectValue placeholder="All Ratings" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -235,13 +273,38 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
                                             })}
                                         </SelectContent>
                                     </Select>
-                                    {hasActiveFilters && (
+
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-xs text-gray-600 dark:text-gray-400">From Date</label>
+                                        <Input
+                                            type="date"
+                                            value={filters.date_from || ''}
+                                            onChange={(e) => handleDateFromFilter(e.target.value)}
+                                            className="w-full"
+                                            title="Filter books created from this date"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-xs text-gray-600 dark:text-gray-400">To Date</label>
+                                        <Input
+                                            type="date"
+                                            value={filters.date_to || ''}
+                                            onChange={(e) => handleDateToFilter(e.target.value)}
+                                            className="w-full"
+                                            title="Filter books created until this date"
+                                        />
+                                    </div>
+                                </div>
+
+                                {hasActiveFilters && (
+                                    <div className="flex justify-center sm:justify-start">
                                         <Button variant="outline" onClick={clearFilters} className="flex items-center gap-2">
                                             <X className="h-4 w-4" />
-                                            Clear
+                                            Clear Filters
                                         </Button>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
@@ -263,9 +326,9 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
                     )}
 
                     {books.data.length > 0 && books.meta.links && (
-                        <div className="mt-8 flex items-center justify-between">
-                            <div className="text-sm text-gray-600 dark:text-gray-400">Showing books from our collection</div>
-                            <div className="flex items-center gap-2">
+                        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="text-center text-sm text-gray-600 sm:text-left dark:text-gray-400">Showing books from our collection</div>
+                            <div className="flex items-center justify-center gap-2">
                                 {Array.isArray(books.meta.links) &&
                                     books.meta.links.map((link, index) => <PaginationButton key={index} link={link} filters={filters} />)}
                             </div>
@@ -318,6 +381,8 @@ interface PaginationButtonProps {
         search?: string;
         author?: string;
         rating?: string;
+        date_from?: string;
+        date_to?: string;
     };
 }
 
@@ -344,6 +409,12 @@ function PaginationButton({ link, filters }: PaginationButtonProps) {
         }
         if (filters.rating) {
             url.searchParams.set('rating', filters.rating);
+        }
+        if (filters.date_from) {
+            url.searchParams.set('date_from', filters.date_from);
+        }
+        if (filters.date_to) {
+            url.searchParams.set('date_to', filters.date_to);
         }
 
         return url.toString();

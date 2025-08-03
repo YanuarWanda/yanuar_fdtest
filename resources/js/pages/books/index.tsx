@@ -32,6 +32,8 @@ interface BooksPageProps {
         search?: string;
         author?: string;
         rating?: string;
+        date_from?: string;
+        date_to?: string;
     };
     authors: string[];
 }
@@ -125,11 +127,45 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
         });
     };
 
+    const handleDateFromFilter = (value: string) => {
+        const url = new URL(window.location.href);
+
+        if (value) {
+            url.searchParams.set('date_from', value);
+        } else {
+            url.searchParams.delete('date_from');
+        }
+
+        url.searchParams.delete('page');
+
+        router.visit(url.toString(), {
+            preserveState: true,
+        });
+    };
+
+    const handleDateToFilter = (value: string) => {
+        const url = new URL(window.location.href);
+
+        if (value) {
+            url.searchParams.set('date_to', value);
+        } else {
+            url.searchParams.delete('date_to');
+        }
+
+        url.searchParams.delete('page');
+
+        router.visit(url.toString(), {
+            preserveState: true,
+        });
+    };
+
     const clearFilters = () => {
         const url = new URL(window.location.href);
         url.searchParams.delete('search');
         url.searchParams.delete('author');
         url.searchParams.delete('rating');
+        url.searchParams.delete('date_from');
+        url.searchParams.delete('date_to');
         url.searchParams.delete('page');
 
         setSearchTerm('');
@@ -151,7 +187,7 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
     const navigateToView = (book: BookResource) => router.get(route('books.show', book.id));
     const navigateToEdit = (book: BookResource) => router.get(route('books.edit', book.id));
 
-    const hasActiveFilters = Boolean(filters.search || filters.author || filters.rating);
+    const hasActiveFilters = Boolean(filters.search || filters.author || filters.rating || filters.date_from || filters.date_to);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -173,11 +209,15 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
                     search={searchTerm}
                     selectedAuthor={getAuthorDisplayValue()}
                     minRating={getMinRatingDisplayValue()}
+                    dateFrom={filters.date_from || ''}
+                    dateTo={filters.date_to || ''}
                     authors={authors}
                     hasActiveFilters={hasActiveFilters}
                     onSearchChange={setSearchTerm}
                     onAuthorChange={handleAuthorFilter}
                     onMinRatingChange={handleMinRatingFilter}
+                    onDateFromChange={handleDateFromFilter}
+                    onDateToChange={handleDateToFilter}
                     onClearFilters={clearFilters}
                     onClearSearch={handleClearSearch}
                 />
@@ -216,11 +256,15 @@ interface BookFiltersProps {
     search: string;
     selectedAuthor: string;
     minRating: string;
+    dateFrom: string;
+    dateTo: string;
     authors: string[];
     hasActiveFilters: boolean;
     onSearchChange: (value: string) => void;
     onAuthorChange: (value: string) => void;
     onMinRatingChange: (value: string) => void;
+    onDateFromChange: (value: string) => void;
+    onDateToChange: (value: string) => void;
     onClearFilters: () => void;
     onClearSearch: () => void;
 }
@@ -229,16 +273,20 @@ function BookFilters({
     search,
     selectedAuthor,
     minRating,
+    dateFrom,
+    dateTo,
     authors,
     hasActiveFilters,
     onSearchChange,
     onAuthorChange,
     onMinRatingChange,
+    onDateFromChange,
+    onDateToChange,
     onClearFilters,
     onClearSearch,
 }: BookFiltersProps) {
     return (
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
             <div className="relative flex-1">
                 <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -293,6 +341,28 @@ function BookFilters({
                         })}
                     </SelectContent>
                 </Select>
+            </div>
+
+            <div className="flex flex-col gap-1 sm:w-36">
+                <label className="text-xs text-gray-600 dark:text-gray-400">From Date</label>
+                <Input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => onDateFromChange(e.target.value)}
+                    className="w-full"
+                    title="Filter books created from this date"
+                />
+            </div>
+
+            <div className="flex flex-col gap-1 sm:w-36">
+                <label className="text-xs text-gray-600 dark:text-gray-400">To Date</label>
+                <Input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => onDateToChange(e.target.value)}
+                    className="w-full"
+                    title="Filter books created until this date"
+                />
             </div>
 
             {hasActiveFilters && (
@@ -498,7 +568,13 @@ function EmptyStateMobile({ hasFilters, onCreate }: EmptyStateProps) {
     );
 }
 
-function Pagination({ links, filters }: { links: PaginatedLink[]; filters: { search?: string; author?: string; rating?: string } }) {
+function Pagination({
+    links,
+    filters,
+}: {
+    links: PaginatedLink[];
+    filters: { search?: string; author?: string; rating?: string; date_from?: string; date_to?: string };
+}) {
     const getPaginationContent = (label: string) => {
         const cleanLabel = label
             .replace(/&laquo;/g, '')
@@ -531,10 +607,15 @@ function Pagination({ links, filters }: { links: PaginatedLink[]; filters: { sea
         if (filters.rating) {
             url.searchParams.set('rating', filters.rating);
         }
+        if (filters.date_from) {
+            url.searchParams.set('date_from', filters.date_from);
+        }
+        if (filters.date_to) {
+            url.searchParams.set('date_to', filters.date_to);
+        }
 
         return url.toString();
     };
-
     return (
         <div className="flex items-center justify-center gap-1 px-2 sm:gap-2">
             {links.map((link, index) => (

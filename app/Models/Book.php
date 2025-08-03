@@ -85,6 +85,36 @@ class Book extends Model
     }
 
     /**
+     * Scope a query to filter books by date created range.
+     */
+    public function scopeByDateCreated(Builder $query, ?string $dateFrom = null, ?string $dateTo = null): Builder
+    {
+        if (empty($dateFrom) && empty($dateTo)) {
+            return $query;
+        }
+
+        if (!empty($dateFrom) && !empty($dateTo)) {
+            // Both dates provided - filter between range
+            return $query->whereBetween('created_at', [
+                $dateFrom . ' 00:00:00',
+                $dateTo . ' 23:59:59'
+            ]);
+        }
+
+        if (!empty($dateFrom)) {
+            // Only from date - filter from date onwards
+            return $query->where('created_at', '>=', $dateFrom . ' 00:00:00');
+        }
+
+        if (!empty($dateTo)) {
+            // Only to date - filter up to date
+            return $query->where('created_at', '<=', $dateTo . ' 23:59:59');
+        }
+
+        return $query;
+    }
+
+    /**
      * Scope a query to search books by title or author.
      */
     public function scopeSearch(Builder $query, ?string $search): Builder
@@ -131,7 +161,8 @@ class Book extends Model
         return $query
             ->search($filters['search'] ?? null)
             ->byAuthor($filters['author'] ?? null)
-            ->withRating($filters['rating'] ?? null);
+            ->withRating($filters['rating'] ?? null)
+            ->byDateCreated($filters['date_from'] ?? null, $filters['date_to'] ?? null);
     }
 
     /**
