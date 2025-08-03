@@ -2,7 +2,8 @@ import { formatDate } from '@/lib/utils';
 import { BreadcrumbItem } from '@/types';
 import { UserResource } from '@/types/users';
 import { Head, router } from '@inertiajs/react';
-import { ArrowLeft, Book, Calendar, Star } from 'lucide-react';
+import { ArrowLeft, Book, Calendar, Edit, Star } from 'lucide-react';
+import { route } from 'ziggy-js';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,20 +33,24 @@ export default function BookShow({ book }: BookShowProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
-            href: '/dashboard',
+            href: route('dashboard'),
         },
         {
             title: 'Books',
-            href: '/books',
+            href: route('books.index'),
         },
         {
             title: book.data.title,
-            href: `/books/${book.data.id}`,
+            href: route('books.show', book.data.id),
         },
     ];
 
     const handleBack = () => {
-        router.get('/books');
+        router.get(route('books.index'));
+    };
+
+    const handleEdit = () => {
+        router.get(route('books.edit', book.data.id));
     };
 
     return (
@@ -57,6 +62,10 @@ export default function BookShow({ book }: BookShowProps) {
                     <Button variant="outline" onClick={handleBack} className="flex w-fit items-center gap-2">
                         <ArrowLeft className="h-4 w-4" />
                         Back to Books
+                    </Button>
+                    <Button variant="outline" onClick={handleEdit} className="flex w-fit items-center gap-2">
+                        <Edit className="h-4 w-4" />
+                        Edit Book
                     </Button>
                 </div>
 

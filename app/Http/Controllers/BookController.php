@@ -7,6 +7,8 @@ use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -49,6 +51,54 @@ class BookController extends Controller
         return Inertia::render('books/show', [
             'book' => new BookResource($book),
         ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Book $book): Response
+    {
+        if ($book->user_id !== Auth::id()) {
+            abort(404);
+        }
+
+        return Inertia::render('books/edit', [
+            'book' => new BookResource($book),
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     * Handles both PUT and PATCH requests.
+     */
+    public function update(Request $request, Book $book): \Illuminate\Http\RedirectResponse
+    {
+        if ($book->user_id !== Auth::id()) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'author' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:2000'],
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+        ]);
+
+        if ($request->hasFile('thumbnail')) {
+            if ($book->thumbnail) {
+                Storage::disk('public')->delete($book->thumbnail);
+            }
+
+            $path = $request->file('thumbnail')->store('books/thumbnails', 'public');
+            $validated['thumbnail'] = $path;
+
+            Log::info('File uploaded successfully:', ['path' => $path]);
+        }
+
+        $book->update($validated);
+
+        return redirect()->route('books.show', $book)->with('success', 'Book updated successfully!');
     }
 
     /**

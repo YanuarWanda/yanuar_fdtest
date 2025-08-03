@@ -4,6 +4,7 @@ import { UserResource } from '@/types/users';
 import { Head, Link, router } from '@inertiajs/react';
 import { Book, Calendar, ChevronLeft, ChevronRight, Plus, Search, Star, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { route } from 'ziggy-js';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,11 +39,11 @@ interface BooksPageProps {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: route('dashboard'),
     },
     {
         title: 'Books',
-        href: '/books',
+        href: route('books.index'),
     },
 ];
 
@@ -131,9 +132,9 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
         return filters.rating || 'all';
     };
 
-    const navigateToCreate = () => router.get('/books/create');
-    const navigateToView = (book: BookResource) => router.get(`/books/${book.id}`);
-    const navigateToEdit = (book: BookResource) => router.get(`/books/${book.id}/edit`);
+    const navigateToCreate = () => router.get(route('books.create'));
+    const navigateToView = (book: BookResource) => router.get(route('books.show', book.id));
+    const navigateToEdit = (book: BookResource) => router.get(route('books.edit', book.id));
 
     const hasActiveFilters = Boolean(filters.search || filters.author || filters.rating);
 
