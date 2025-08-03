@@ -38,6 +38,20 @@ class BookController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(Book $book): Response
+    {
+        if ($book->user_id !== Auth::id()) {
+            abort(404);
+        }
+
+        return Inertia::render('books/show', [
+            'book' => new BookResource($book),
+        ]);
+    }
+
+    /**
      * Get all unique authors for the authenticated user's books.
      */
     private function getAuthorsForUser(int $userId): array
