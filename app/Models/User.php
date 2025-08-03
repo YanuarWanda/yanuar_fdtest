@@ -45,4 +45,43 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Scope a query to search users by name or email.
+     */
+    public function scopeSearch($query, ?string $search)
+    {
+        if (empty($search)) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($search) {
+            $q->where('name', 'ILIKE', "%{$search}%")
+                ->orWhere('email', 'ILIKE', "%{$search}%");
+        });
+    }
+
+    /**
+     * Scope a query to filter users by verification status.
+     */
+    public function scopeByStatus($query, ?string $status)
+    {
+        if (empty($status)) {
+            return $query;
+        }
+
+        return match ($status) {
+            'verified' => $query->whereNotNull('email_verified_at'),
+            'unverified' => $query->whereNull('email_verified_at'),
+            default => $query,
+        };
+    }
+
+    /**
+     * Scope a query to get users with basic information.
+     */
+    public function scopeWithBasicInfo($query)
+    {
+        return $query->select('id', 'name', 'email', 'email_verified_at', 'created_at');
+    }
 }
