@@ -6,6 +6,7 @@ import { Book, ChevronLeft, ChevronRight, LogIn, Search, Star, UserPlus, X } fro
 import { useCallback, useEffect, useState } from 'react';
 import { route } from 'ziggy-js';
 
+import PaginationInfo from '@/components/shared/pagination-info';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -95,7 +96,6 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
     };
 
     const handleRatingFilter = (value: string) => {
-        // Don't navigate if the filter hasn't changed
         if (value === getRatingDisplayValue()) {
             return;
         }
@@ -338,7 +338,7 @@ export default function Welcome({ auth, books, filters, authors }: WelcomePagePr
 
                     {books.data.length > 0 && books.meta.links && (
                         <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="text-center text-sm text-gray-600 sm:text-left dark:text-gray-400">Showing books from our collection</div>
+                            <PaginationInfo meta={books.meta} resourceName="Books" />
                             <div className="flex items-center justify-center gap-2">
                                 {Array.isArray(books.meta.links) &&
                                     books.meta.links.map((link, index) => <PaginationButton key={index} link={link} filters={filters} />)}

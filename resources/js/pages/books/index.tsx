@@ -6,6 +6,7 @@ import { Book, Calendar, ChevronLeft, ChevronRight, Plus, Search, Star, X } from
 import { useCallback, useEffect, useState } from 'react';
 import { route } from 'ziggy-js';
 
+import PaginationInfo from '@/components/shared/pagination-info';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -259,7 +260,7 @@ export default function BooksIndex({ books, filters, authors }: BooksPageProps) 
 
                 {books.meta.links && <Pagination links={books.meta.links} filters={filters} />}
 
-                {books.meta.total > 0 && <PaginationInfo meta={books.meta} />}
+                {books.meta.total > 0 && <PaginationInfo meta={books.meta} resourceName="Books" />}
             </div>
         </AppLayout>
     );
@@ -643,22 +644,6 @@ function Pagination({
                     {link.url ? <Link href={getUrlWithFilters(link.url)}>{getPaginationContent(link.label)}</Link> : getPaginationContent(link.label)}
                 </Button>
             ))}
-        </div>
-    );
-}
-
-interface PaginationInfoProps {
-    meta: {
-        current_page: number;
-        per_page: number;
-        total: number;
-    };
-}
-
-function PaginationInfo({ meta }: PaginationInfoProps) {
-    return (
-        <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Showing {(meta.current_page - 1) * meta.per_page + 1} to {Math.min(meta.current_page * meta.per_page, meta.total)} of {meta.total} books
         </div>
     );
 }

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import UsersDesktopContent from '@/components/features/users/users-desktop-content';
 import UsersMobileContent from '@/components/features/users/users-mobile.content';
+import PaginationInfo from '@/components/shared/pagination-info';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -205,6 +206,8 @@ export default function UsersTable({ users, filters }: UsersIndexProps) {
                         ))}
                     </div>
                 )}
+
+                {users.meta.total > 0 && <PaginationInfo meta={users.meta} resourceName="Users" />}
             </div>
         </AppLayout>
     );

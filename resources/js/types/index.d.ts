@@ -54,16 +54,18 @@ export interface ResourceLink {
     prev: string;
 }
 
+export interface PaginationMeta {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number | null;
+    to: number | null;
+    links: PaginatedLink[];
+}
+
 export interface PaginatedResource<T> {
-    data: T[],
-    meta: {
-        current_page: number;
-        last_page: number;
-        per_page: number;
-        total: number;
-        from: number | null;
-        to: number | null;
-        links: PaginatedLink[]
-    };
+    data: T[];
+    meta: PaginationMeta;
     links: ResourceLink;
 }
