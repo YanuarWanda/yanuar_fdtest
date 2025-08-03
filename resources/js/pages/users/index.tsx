@@ -183,7 +183,7 @@ export default function UsersTable({ users, filters }: UsersIndexProps) {
 
                 {users.meta.last_page > 1 && (
                     <div className="flex items-center justify-center gap-1 px-2 sm:gap-2">
-                        {users.links.map((link, index) => (
+                        {users.meta.links.map((link, index) => (
                             <Button
                                 key={index}
                                 variant={link.active ? 'default' : 'outline'}
